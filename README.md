@@ -3,14 +3,13 @@
 > send email messages. It responds to all standard SMTP commands but does not deliver messages to the user.
 > The messages are stored within the Dumbster for later extraction and verification.
 
-**This repository is a fork of [http://quintanasoft.com/dumbster/](http://quintanasoft.com/dumbster/).**
+**This repository is a fork of [https://github.com/kirviq/dumbster](https://github.com/kirviq/dumbster).**
 
-I forked it for two reasons:
-
-1. I wanted to have typed lists as return values.
-2. I wanted the server to be able to just pick a port itself and then tell me which port it got.
-
-And while I'm at it, using slf4j instead of stdout is also nice.
+Differences:
+1. Added a possibility to attach a listener on messages arriving
+2. Add support for multipart messages (patch created by [koke24](https://github.com/koke24))
+3. Remove lombok
+4. Make SmtpMessage Json serializable and deserializable
 
 Aside from that, the actual smtp logic is completely unchanged.
 
@@ -18,9 +17,9 @@ Aside from that, the actual smtp logic is completely unchanged.
 Add maven dependency:
 ```xml
 <dependency>
-    <groupId>com.github.kirviq</groupId>
+    <groupId>se.alipsa</groupId>
     <artifactId>dumbster</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <scope>test</scope>
 </dependency>
 ```
@@ -42,4 +41,4 @@ class SomeTest {
     }
 }
 ```
-See more examples in the included [unit tests](https://github.com/kirviq/dumbster/blob/master/src/test/java/com/dumbster/smtp/SimpleSmtpServerTest.java).
+See more examples in the included [unit tests](https://github.com/alipsa/dumbster/blob/master/src/test/java/com/dumbster/smtp/SimpleSmtpServerTest.java).

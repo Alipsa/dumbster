@@ -17,6 +17,9 @@
  */
 package com.dumbster.smtp;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -28,6 +31,8 @@ import java.util.Set;
 /**
  * Container for a complete SMTP message - headers and message body.
  */
+@JsonSerialize(using = SmtpMessageSerializer.class)
+@JsonDeserialize(using = SmtpMessageDeserializer.class)
 public class SmtpMessage {
 	/** Headers: Map of List of String hashed on header name. */
 	private Map<String, List<String>> headers;
@@ -40,12 +45,40 @@ public class SmtpMessage {
 		body = new StringBuilder();
 	}
 
+	public void store(SmtpResponse response, String params) {
+		store(response, params, false);
+	}
+
+	/**
+	 * Update the headers or body depending on the SmtpResponse object and line of input.
+	 * Adds an optional newline character at the end to support multipart messages
+	 *
+	 * @param response SmtpResponse object
+	 * @param params   remainder of input line after SMTP command has been removed
+	 * @param addnl    adds a newline '\n' character at the end of the line
+	 */
+	public void store(SmtpResponse response, String params, boolean addnl) {
+		if (params != null) {
+			if (SmtpState.DATA_HDR.equals(response.getNextState())) {
+				int headerNameEnd = params.indexOf(':');
+				if (headerNameEnd >= 0) {
+					String name = params.substring(0, headerNameEnd).trim();
+					String value = params.substring(headerNameEnd + 1).trim();
+					addHeader(name, value);
+				}
+			} else if (SmtpState.DATA_BODY == response.getNextState()) {
+				body.append(params);
+				if (addnl) body.append('\n');
+			}
+		}
+	}
+
 	/**
 	 * Update the headers or body depending on the SmtpResponse object and line of input.
 	 *
 	 * @param response SmtpResponse object
 	 * @param params   remainder of input line after SMTP command has been removed
-	 */
+	 *
 	public void store(SmtpResponse response, String params) {
 		if (params != null) {
 			if (SmtpState.DATA_HDR.equals(response.getNextState())) {
@@ -60,6 +93,7 @@ public class SmtpMessage {
 			}
 		}
 	}
+	*/
 
 	/**
 	 * Get an Iterator over the header names.
@@ -115,13 +149,25 @@ public class SmtpMessage {
 	 * @param name  header name
 	 * @param value header value
 	 */
-	private void addHeader(String name, String value) {
+	void addHeader(String name, String value) {
 		List<String> valueList = headers.get(name);
 		if (valueList == null) {
 			valueList = new ArrayList<>(1);
 			headers.put(name, valueList);
 		}
 		valueList.add(value);
+	}
+
+	Map<String, List<String>> getHeaders() {
+		return headers;
+	}
+
+	void setHeaders(Map<String, List<String>> headers) {
+		this.headers = headers;
+	}
+
+	void setBody(String body) {
+		this.body = new StringBuilder(body);
 	}
 
 	/**
@@ -132,17 +178,10 @@ public class SmtpMessage {
 	@Override
 	public String toString() {
 		StringBuilder msg = new StringBuilder();
-		for (Map.Entry<String, List<String>> stringListEntry : headers.entrySet()) {
-			for (String value : stringListEntry.getValue()) {
-				msg.append(stringListEntry.getKey());
-				msg.append(": ");
-				msg.append(value);
-				msg.append('\n');
-			}
-		}
-		msg.append('\n');
-		msg.append(body);
-		msg.append('\n');
+		msg.append("From: ").append(getHeaderValues("From"))
+				.append(", To: ").append(getHeaderValues("To"))
+				.append(", Subject: ").append(getHeaderValue("Subject"))
+				.append(", Message: ").append(getBody());
 		return msg.toString();
 	}
 }

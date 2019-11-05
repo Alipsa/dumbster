@@ -17,7 +17,8 @@
  */
 package com.dumbster.smtp;
 
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,7 +35,6 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 /** Dummy SMTP server for testing purposes. */
-@Slf4j
 public final class SimpleSmtpServer implements AutoCloseable {
 
 	/** Default SMTP port is 25. */
@@ -59,6 +59,10 @@ public final class SimpleSmtpServer implements AutoCloseable {
 
 	/** Indicates the server thread that it should stop */
 	private volatile boolean stopped = false;
+
+	private static EmailReceivedListener messageArrivedListener = null;
+
+	private Logger log = LoggerFactory.getLogger(SimpleSmtpServer.class);
 
 	/**
 	 * Creates an instance of a started SimpleSmtpServer.
@@ -89,6 +93,9 @@ public final class SimpleSmtpServer implements AutoCloseable {
 		this.workerThread.start();
 	}
 
+	public void addListener(EmailReceivedListener listener) {
+		messageArrivedListener = listener;
+	}
 	/**
 	 * @return the port the server is listening on
 	 */
@@ -221,11 +228,21 @@ public final class SimpleSmtpServer implements AutoCloseable {
 
 			// Store input in message
 			String params = request.params;
-			msg.store(response, params);
+			//msg.store(response, params);
+			// support multipart
+			msg.store(response, params,
+					msg.getHeaderValue("Content-Type")!=null
+					&& msg.getHeaderValue("Content-Type").startsWith("multipart")
+					&& params!=null
+					&& params.length()>0
+					&& params.charAt(0)!='\n');
 
 			// If message reception is complete save it
 			if (smtpState == SmtpState.QUIT) {
 				msgList.add(msg);
+				if (messageArrivedListener != null) {
+					messageArrivedListener.messageArrived(msg);
+				}
 				msg = new SmtpMessage();
 			}
 		}

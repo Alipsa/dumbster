@@ -20,9 +20,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.github.kirviq</groupId>
+	<groupId>se.alipsa</groupId>
 	<artifactId>dumbster</artifactId>
-	<version>1.8-SNAPSHOT</version>
+	<version>1.7.2</version>
 
 	<name>dumbster</name>
 	<description>a simple fake SMTP server for unit testing</description>
@@ -38,6 +38,12 @@
 
 	<developers>
 		<developer>
+			<name>Per Nyfelt</name>
+			<url>https://github.com/perNyfelt</url>
+			<organization>Alipsa Development</organization>
+			<organizationUrl>http://www.alipsa.se</organizationUrl>
+		</developer>
+		<developer>
 			<name>Joachim Nicolay</name>
 			<url>https://github.com/kirviq</url>
 		</developer>
@@ -49,13 +55,15 @@
 	</developers>
 
 	<scm>
-		<connection>scm:git:git@github.com:kirviq/dumbster.git</connection>
-		<developerConnection>scm:git:git@github.com:kirviq/dumbster.git</developerConnection>
-		<url>git@github.com:kirviq/dumbster.git</url>
+		<connection>scm:git:git@github.com:Alipsa/dumbster.git</connection>
+		<developerConnection>scm:git:git@github.com:Alipsa/dumbster.git</developerConnection>
+		<url>git@github.com:Alipsa/dumbster.git</url>
 	</scm>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
 	</properties>
 
 	<build>
@@ -65,8 +73,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -127,14 +135,11 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.18</version>
 		</dependency>
-		<!--suppress NonOsgiMavenDependency -->
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.16.6</version>
-			<scope>provided</scope>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>2.10.0</version>
 		</dependency>
-
 		<dependency>
 			<groupId>javax.mail</groupId>
 			<artifactId>mail</artifactId>
