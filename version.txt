@@ -1,5 +1,12 @@
 The following is a list of changes per release:
 
+1.7.2 (2019-11-05)
+Fork from https://github.com/kirviq/dumbster to https://github.com/alipsa/dumbster
+Added a possibility to attach a listener on messages arriving
+Add support for multipart messages (patch created by [koke24](https://github.com/koke24))
+Remove lombok
+Make SmtpMessage Json serializable and deserializable
+
 1.7 (2016-03-18)
 Changed project structure to maven.
 Use Generics and unmodifiable collections to improve usability.
